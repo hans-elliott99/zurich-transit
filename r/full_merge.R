@@ -38,10 +38,10 @@ merged = merge(punctuality_df, passenger_df,
 #--------------#
 #### EXPORT ####
 #--------------#
-# Full Dataset:
+## Full Dataset:
 #write.csv(merged, here("data", "zurich_transit_allvars.csv"), row.names = FALSE)
 
-#Selected Variables for ML Project:
+##Selected Variables for ML Project:
 df = merged %>% select(
   # identifiers
   line, vehicle_id, course_id, transit_type, circulation_num,
@@ -92,28 +92,10 @@ write.csv(df, here("data", "zurich-transit.csv"), row.names = FALSE)
 
 
 # other ----------
-skimr::skim(df)
-
-
-## Map Df:
+## Map df (cleaned dataset for easy mapping of the data with ggplot2 or other method)
 bus = c("BG","BL","BP","BZ")
 mapping_df = 
   df %>% select(line, from_stopnum, from_longitude, from_latitude, transit_type) %>% unique() %>%
   mutate(transit_type = ifelse(transit_type %in% bus, "B", transit_type) )
 
 write.csv(mapping_df, here("data", "zurich_map_data.csv"), row.names = FALSE)
-
-
-#
-df %>% select(after_sch_dep,after_act_dep) %>%
-  ggplot() + 
-    geom_point(aes(x=after_sch_dep, y = after_act_dep))
-
-
-# Notes for Hans:
-# No night transit in this week sample, so any vars related to night transit are dropped in select df
-# line 2 is most common, it is type T (with some NAs, but most likely due to the transit_type
-# coming from the passenger data and not matching to every ride, so could be imputed)
-# believe corresponds to the S2
-# https://en.wikipedia.org/wiki/S2_(ZVV)
-
