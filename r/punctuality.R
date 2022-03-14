@@ -8,7 +8,7 @@
 #        The link to the specific script is below:
 #        https://github.com/VerkehrsbetriebeZuerich/ogd_examples_R/blob/main/05_Skripte/example_traveltimedata.R
 #
-# Data: All files for this script come from: https://data.stadt-zuerich.ch/dataset/vbz_fahrzeiten_ogd (March 1, 2022).
+# Data: All data files for this script come from: https://data.stadt-zuerich.ch/dataset/vbz_fahrzeiten_ogd (March 1, 2022).
 #       The .CSV files that are loaded by the script below are the original names.
 #
 # Project: This script collects and prepares the ZBA trip data to be combined
