@@ -1,5 +1,8 @@
 # zurich-transit
 Repository for files related to Zurich transit data and project.  
+Kaggle dataset: https://www.kaggle.com/hanselliott/a-week-of-zurich-transit  
+Project: https://www.kaggle.com/hanselliott/predicting-the-punctuality-of-zurich-transit  
+
 **Data information:**
 
 --PUNCTUALITY DATA--  
