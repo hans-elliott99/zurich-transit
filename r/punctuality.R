@@ -14,7 +14,6 @@
 # Project: This script collects and prepares the ZBA trip data to be combined
 #          with ZBA passenger data, to create a full dataset for a machine learning project.
 #          The partner scripts are titled: 'passenger.R' and 'full_merge.R'
-# Full Machine Learning Project: https://www.kaggle.com/hanselliott/predicting-the-punctuality-of-zurich-transit
 ##-----------------------------------------------------------------------------##
 
 
@@ -23,18 +22,23 @@
 #-------------#
 # Libraries
 library(pacman)
-pacman::p_load(tidyverse, here, magrittr)
+pacman::p_load(dplyr, readr, here, magrittr, arrow)
 
+
+args = commandArgs(trailingOnly = TRUE)
+punctuality_df_path = args[1]
+p = strsplit(punctuality_df_path, split = "_")[[1]]
+week_start = p[length(p) - 1]
 #---------------------#
 #### Matching Data ####
 #---------------------#
 # Load merge Data
-haltepunkt = here("data", "haltepunkt.csv") %>% read_csv()
-haltestelle = here("data", "haltestelle.csv") %>% read_csv()
+haltepunkt = here("data", "Haltepunkt.csv") %>% read_csv()
+haltestelle = here("data", "Haltestelle.csv") %>% read_csv()
 
 #Merge with 'fahrzeiten' data:
-#
-punctuality_df = here("data", "Fahrzeiten_SOLL_IST_20220102_20220108.csv") %>% read_csv() %>%
+#  here("data", "Fahrzeiten_SOLL_IST_20220102_20220108.csv")
+punctuality_df = punctuality_df_path %>% read_csv() %>%
   #join haltepunkt to "from" ("von")
   left_join(haltepunkt,
             by=c("halt_punkt_id_von"="halt_punkt_id",
@@ -76,7 +80,7 @@ punctuality_df = here("data", "Fahrzeiten_SOLL_IST_20220102_20220108.csv") %>% r
 #### ADD TRANSIT TYPE ####
 #------------------------#
 #load line description data:
-LINIE <- read.csv(here("data","LINIE.csv"),
+LINIE = read.csv(here("data","LINIE.csv"),
                   encoding="UTF-8",
                   sep=";")
 # select wanted variables
@@ -128,6 +132,10 @@ punctuality_df %<>% rename(
 #---------------------#
 #### FINAL DATASET ####
 #---------------------#
-#write dataset to desired folder ["data"] and provide name ["punctuality.csv"]
-#user may have to add additional/different folder titles based on their file structure
-write.csv(punctuality_df, here("data", "punctuality.csv"), row.names = FALSE)
+arrow::write_feather(punctuality_df,
+                     here(paste0("data/punctuality_",week_start,".arrow"))
+                     )
+
+
+
+

@@ -12,7 +12,6 @@
 #          full dataset for a machine learning project.
 #          The partner scripts are titled: 'punctuality.R' & 'passenger.R', which will process
 #          and output the data needed for this merge file
-# Full Machine Learning Project: https://www.kaggle.com/hanselliott/predicting-the-punctuality-of-zurich-transit
 ##-----------------------------------------------------------------------------##
 
 #-----------------------------#
@@ -20,12 +19,21 @@
 #-----------------------------#
 #Libraries:
 library(pacman)
-pacman::p_load(tidyverse, here, translateR, magrittr, data.table)
+pacman::p_load(dplyr, magrittr, here, arrow)
+
+
+args = commandArgs(trailingOnly = TRUE)
+raw_data_path = args[1]
+p = strsplit(raw_data_path, split = "_")[[1]]
+week_start = p[length(p) - 1]
+punctuality_df_path = paste0("data/punctuality_",week_start,".arrow")
 
 # Data:
   #files produced by partner scripts identified above
-passenger_df = here("data","passenger.csv") %>% fread()
-punctuality_df = here("data","punctuality.csv") %>% fread()
+passenger_df = here("data/passenger.arrow") %>% 
+  arrow::read_feather()
+punctuality_df = punctuality_df_path %>% 
+  arrow::read_feather()
 
 #-------------#
 #### Merge ####
@@ -86,16 +94,21 @@ unit_id = c(1:nrow(df))
 df = cbind(unit_id, df)
 
 # EXPORT
-write.csv(df, here("data", "zurich-transit.csv"), row.names = FALSE)
-
-
+final = paste0("zurich_transit_",week_start,".csv")
+write.csv(df, here("data", final), row.names = FALSE)
+cat("Finished compiling dataset:", final, "\n")
 
 
 # other ----------
+if (FALSE) {
 ## Map df (cleaned dataset for easy mapping of the data with ggplot2 or other method)
 bus = c("BG","BL","BP","BZ")
 mapping_df = 
-  df %>% select(line, from_stopnum, from_longitude, from_latitude, transit_type) %>% unique() %>%
-  mutate(transit_type = ifelse(transit_type %in% bus, "B", transit_type) )
+  df %>% 
+  select(line, from_stopnum, from_longitude, from_latitude, transit_type) %>%
+  unique()
+
 
 write.csv(mapping_df, here("data", "zurich_map_data.csv"), row.names = FALSE)
+}
+

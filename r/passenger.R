@@ -14,44 +14,48 @@
 # Project: This script collects and prepares the ZBA passenger data to be combined
 #          with ZBA trip data, creating a full dataset for a machine learning project.
 #          The partner script is titled: 'punctuality.R'
-# Full Machine Learning Project: https://www.kaggle.com/hanselliott/predicting-the-punctuality-of-zurich-transit
 ##-----------------------------------------------------------------------------##
 
+#### Some key terms ####
+#einsteiger = entries (Mean value of people boarding at the bus stop from the measurements taken into account)
+#aussteiger = exits (Mean value of people getting off at the bus stop from the measurements taken into account)
+#besetzung = mean occupancy during the section between Stop & After Stop (Haltestellen_ID,Nach_Hst_Id)
+#fahrdistanz = driving distance between Stop & After Stop (meters)
 
 #-------------#
 #### Setup ####
 #-------------#
 # Libraries
 library(pacman)
-pacman::p_load(tidyverse, here, magrittr)
+pacman::p_load(dplyr, readr, here, magrittr, arrow)
 
 #------------------#
 #### DATA MERGE ####
 #------------------#
 ## First Load in Each Dataset
-HALTESTELLEN <- read.csv(here("data","HALTESTELLEN.csv"),
+HALTESTELLEN = read.csv(here("data","HALTESTELLEN.csv"),
                          encoding="UTF-8",
                          sep=";")
 
-TAGTYP <- read.csv(here("data","TAGTYP.csv"),
+TAGTYP = read.csv(here("data","TAGTYP.csv"),
                    encoding="UTF-8",
                    sep=";")
 
-LINIE <- read.csv(here("data","LINIE.csv"),
+LINIE = read.csv(here("data","LINIE.csv"),
                   encoding="UTF-8",
                   sep=";")
 
-GEFAESSGROESSE <- read.csv(here("data","GEFAESSGROESSE.csv"),
+GEFAESSGROESSE = read.csv(here("data","GEFAESSGROESSE.csv"),
                            encoding="UTF-8",
                            sep=";")
 
-   
-REISENDE <- read.csv(here("data","REISENDE.csv"),
+
+REISENDE = read.csv(here("data","REISENDE.csv"),
                      encoding="UTF-8",
                      sep=";")
 
 ## Matching:
-REISENDE_merge <- REISENDE %>%
+REISENDE_merge = REISENDE %>%
   #remove column Linienname from REISENDE
   select(-Linienname)%>%
   #join HALTESTELLEN
@@ -158,22 +162,14 @@ passenger_merge %<>% rename(
 #----------------------------#
 #### FINAL PASSENGER DATA ####
 #----------------------------#
-  #write dataset to desired folder ["data"] and provide name ["passenger.csv"]
-  #user may have to add additional/different folder titles based on their file structure
+arrow::write_feather(passenger_merge, here("data/passenger.arrow"))
   #
-write.csv(passenger_merge, here("data","passenger.csv"), row.names = FALSE)
-  #
-  #This data will match to punctuality data based on 'line' and 
-  #            stops ('from_stopnum','after_stopnum')
+  # This data will match to punctuality data based on 'line' and  stops 
+  # ('from_stopnum','after_stopnum')
 
 
 
 
-#### Some key terms ####
-#einsteiger = entries (Mean value of people boarding at the bus stop from the measurements taken into account)
-#aussteiger = exits (Mean value of people getting off at the bus stop from the measurements taken into account)
-#besetzung = mean occupancy during the section between Stop & After Stop (Haltestellen_ID,Nach_Hst_Id)
-#fahrdistanz = driving distance between Stop & After Stop (meters)
 
 
 
